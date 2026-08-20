@@ -21,15 +21,20 @@ target_link_libraries(IB_PHENIX
 )
 
 # Génération de l'EBOOT.PBP
+"
+)
 add_custom_command(TARGET IB_PHENIX POST_BUILD
     COMMAND mksfo "IB PHENIX" PARAM.SFO
-    COMMAND pack-pbp EBOOT.PBP PARAM.SFO
+    COMMAND pack-pbp
+            EBOOT.PBP
+            PARAM.SFO
             NULL
             NULL
             NULL
             NULL
             NULL
             IB_PHENIX
+            NULL
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     COMMENT "Création de EBOOT.PBP"
-)
+) 
