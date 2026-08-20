@@ -56,28 +56,25 @@ int main(void)
 
     SceCtrlData pad;
 
-    pspDebugScreenPrintf("\n\n");
-    pspDebugScreenPrintf("================================\n");
-    pspDebugScreenPrintf("          IB PHENIX PSP\n");
-    pspDebugScreenPrintf("================================\n\n");
-    pspDebugScreenPrintf("          PROTOTYPE V2\n\n");
-    pspDebugScreenPrintf("          Bienvenue !\n\n");
-    pspDebugScreenPrintf("     Appuie sur START pour\n");
-    pspDebugScreenPrintf("          quitter.\n\n");
-
     while (1)
     {
         sceCtrlPeekBufferPositive(&pad, 1);
 
+        pspDebugScreenSetXY(0, 5);
+
+        pspDebugScreenPrintf("BUTTONS: %08X\n", pad.Buttons);
+        pspDebugScreenPrintf("X: %d  O: %d  START: %d\n",
+            (pad.Buttons & PSP_CTRL_CROSS) != 0,
+            (pad.Buttons & PSP_CTRL_CIRCLE) != 0,
+            (pad.Buttons & PSP_CTRL_START) != 0);
+
         if (pad.Buttons & PSP_CTRL_START)
         {
-            break;
+            sceKernelExitGame();
         }
 
         sceDisplayWaitVblankStart();
     }
-
-    sceKernelExitGame();
 
     return 0;
 }
