@@ -3,7 +3,7 @@
 #include <pspdebug.h>
 #include <pspctrl.h>
 
-PSP_MODULE_INFO("IB PHENIX", 0, 1, 0);
+PSP_MODULE_INFO("IB_PHENIX", 0, 1, 0);
 PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
 
 int exit_callback(int arg1, int arg2, void *common)
