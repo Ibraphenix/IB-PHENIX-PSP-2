@@ -62,11 +62,9 @@ int main(void)
 
         pspDebugScreenSetXY(0, 5);
 
-        pspDebugScreenPrintf("BUTTONS: %08X\n", pad.Buttons);
-        pspDebugScreenPrintf("X: %d  O: %d  START: %d\n",
-            (pad.Buttons & PSP_CTRL_CROSS) != 0,
-            (pad.Buttons & PSP_CTRL_CIRCLE) != 0,
-            (pad.Buttons & PSP_CTRL_START) != 0);
+pspDebugScreenPrintf("BUTTONS: %08X\n", pad.Buttons);
+pspDebugScreenPrintf("ANALOG X: %3d\n", pad.Lx);
+pspDebugScreenPrintf("ANALOG Y: %3d\n", pad.Ly);
 
         if (pad.Buttons & PSP_CTRL_START)
         {
