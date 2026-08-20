@@ -121,10 +121,10 @@ void drawEnemy(int x, int y)
 
 void drawHealth(int health)
 {
+    int i;
+
     pspDebugScreenSetXY(2, 2);
     pspDebugScreenPrintf("HP: ");
-
-    int i;
 
     for (i = 0; i < 10; i++)
     {
@@ -137,12 +137,22 @@ void drawHealth(int health)
     pspDebugScreenPrintf(" %d/10", health);
 }
 
+void drawMission(int defeated)
+{
+    pspDebugScreenSetXY(35, 2);
+    pspDebugScreenPrintf("MISSION 01");
+
+    pspDebugScreenSetXY(35, 3);
+    pspDebugScreenPrintf("ENEMI: %d/1", defeated);
+}
+
 void drawGame(
     int playerX,
     int playerY,
     int enemyX,
     int enemyY,
-    int health
+    int health,
+    int defeated
 )
 {
     pspDebugScreenClear();
@@ -151,6 +161,7 @@ void drawGame(
     pspDebugScreenPrintf("IB PHENIX - ZONE 01");
 
     drawHealth(health);
+    drawMission(defeated);
 
     pspDebugScreenSetXY(2, 5);
     pspDebugScreenPrintf(
@@ -158,22 +169,24 @@ void drawGame(
     );
 
     pspDebugScreenSetXY(5, 8);
-    pspDebugScreenPrintf("FOREST OF THE PHOENIX");
+    pspDebugScreenPrintf("MISSION 01");
+
+    pspDebugScreenSetXY(5, 9);
+    pspDebugScreenPrintf("LE REVEIL DU PHENIX");
 
     pspDebugScreenSetXY(5, 11);
-    pspDebugScreenPrintf("      ^       ^       ^");
+    pspDebugScreenPrintf("OBJECTIF:");
 
     pspDebugScreenSetXY(5, 12);
-    pspDebugScreenPrintf("     /|\\     /|\\     /|\\");
+    pspDebugScreenPrintf("Eliminer l'ennemi.");
 
-    pspDebugScreenSetXY(5, 13);
-    pspDebugScreenPrintf("    /###\\   /###\\   /###\\");
+    pspDebugScreenSetXY(5, 16);
+    pspDebugScreenPrintf("FOREST OF THE PHOENIX");
 
-    pspDebugScreenSetXY(5, 17);
-    pspDebugScreenPrintf("              PATH");
+    if (!defeated)
+        drawEnemy(enemyX, enemyY);
 
     drawPlayer(playerX, playerY);
-    drawEnemy(enemyX, enemyY);
 
     pspDebugScreenSetXY(2, 22);
     pspDebugScreenPrintf("ANALOG / D-PAD : MOVE");
@@ -183,6 +196,41 @@ void drawGame(
 
     pspDebugScreenSetXY(2, 25);
     pspDebugScreenPrintf("START : EXIT");
+}
+
+void missionComplete(void)
+{
+    SceCtrlData pad;
+
+    pspDebugScreenClear();
+
+    pspDebugScreenSetXY(12, 6);
+    pspDebugScreenPrintf("MISSION ACCOMPLIE");
+
+    pspDebugScreenSetXY(8, 9);
+    pspDebugScreenPrintf("LE REVEIL DU PHENIX");
+
+    pspDebugScreenSetXY(8, 12);
+    pspDebugScreenPrintf("ENNEMI ELIMINE");
+
+    pspDebugScreenSetXY(8, 14);
+    pspDebugScreenPrintf("RECOMPENSE : +100 XP");
+
+    pspDebugScreenSetXY(7, 19);
+    pspDebugScreenPrintf("APPUIE SUR X POUR CONTINUER");
+
+    while (1)
+    {
+        sceCtrlPeekBufferPositive(&pad, 1);
+
+        if (pad.Buttons & PSP_CTRL_CROSS)
+            break;
+
+        if (pad.Buttons & PSP_CTRL_START)
+            sceKernelExitGame();
+
+        sceDisplayWaitVblankStart();
+    }
 }
 
 void playGame(void)
@@ -199,7 +247,8 @@ void playGame(void)
 
     int health = 10;
 
-    int attackTimer = 0;
+    int defeated = 0;
+
     int damageTimer = 0;
 
     int running = 1;
@@ -247,58 +296,73 @@ void playGame(void)
         if (playerY > 15)
             playerY = 15;
 
-        if (enemyX < playerX)
-            enemyX++;
-
-        if (enemyX > playerX)
-            enemyX--;
-
-        if (enemyY < playerY)
-            enemyY++;
-
-        if (enemyY > playerY)
-            enemyY--;
-
-        if (pressed & PSP_CTRL_CROSS)
+        if (!defeated)
         {
-            attackTimer = 10;
+            if (enemyX < playerX)
+                enemyX++;
 
-            if (enemyX >= playerX - 3 &&
-                enemyX <= playerX + 7 &&
-                enemyY >= playerY - 3 &&
-                enemyY <= playerY + 5)
+            if (enemyX > playerX)
+                enemyX--;
+
+            if (enemyY < playerY)
+                enemyY++;
+
+            if (enemyY > playerY)
+                enemyY--;
+
+            if (pressed & PSP_CTRL_CROSS)
             {
-                enemyX = 42;
-                enemyY = 12;
+                if (enemyX >= playerX - 4 &&
+                    enemyX <= playerX + 7 &&
+                    enemyY >= playerY - 4 &&
+                    enemyY <= playerY + 5)
+                {
+                    defeated = 1;
+                }
+            }
+
+            if (enemyX >= playerX - 2 &&
+                enemyX <= playerX + 5 &&
+                enemyY >= playerY - 2 &&
+                enemyY <= playerY + 4)
+            {
+                if (damageTimer == 0)
+                {
+                    health--;
+                    damageTimer = 30;
+                }
             }
         }
-
-        if (attackTimer > 0)
-            attackTimer--;
 
         if (damageTimer > 0)
             damageTimer--;
 
-        if (enemyX >= playerX - 2 &&
-            enemyX <= playerX + 5 &&
-            enemyY >= playerY - 2 &&
-            enemyY <= playerY + 4)
+        if (health <= 0)
         {
-            if (damageTimer == 0)
-            {
-                health--;
+            playerX = 10;
+            playerY = 12;
+            enemyX = 42;
+            enemyY = 12;
+            health = 10;
+            defeated = 0;
+        }
 
-                damageTimer = 30;
+        if (defeated)
+        {
+            drawGame(
+                playerX,
+                playerY,
+                enemyX,
+                enemyY,
+                health,
+                defeated
+            );
 
-                if (health <= 0)
-                {
-                    health = 10;
-                    playerX = 10;
-                    playerY = 12;
-                    enemyX = 42;
-                    enemyY = 12;
-                }
-            }
+            sceDisplayWaitVblankStart();
+
+            missionComplete();
+
+            running = 0;
         }
 
         if (pressed & PSP_CTRL_CIRCLE)
@@ -312,7 +376,8 @@ void playGame(void)
             playerY,
             enemyX,
             enemyY,
-            health
+            health,
+            defeated
         );
 
         oldButtons = pad.Buttons;
@@ -385,7 +450,7 @@ int main(void)
                 pspDebugScreenPrintf("IB PHENIX PSP");
 
                 pspDebugScreenSetXY(6, 12);
-                pspDebugScreenPrintf("PROTOTYPE");
+                pspDebugScreenPrintf("MISSION SYSTEM");
 
                 pspDebugScreenSetXY(6, 15);
                 pspDebugScreenPrintf("PRESS O TO RETURN");
