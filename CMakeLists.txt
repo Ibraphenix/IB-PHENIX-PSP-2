@@ -10,6 +10,7 @@ add_executable(IB_PHENIX
 
 target_link_libraries(IB_PHENIX
     pspdebug
+    pspge
     pspdisplay
     pspctrl
     pspkernel
