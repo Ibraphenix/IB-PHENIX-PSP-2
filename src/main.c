@@ -20,7 +20,9 @@ int CallbackThread(SceSize args, void *argp)
         NULL
     );
 
-    sceKernelRegisterExitCallback(cbid);
+    if (cbid >= 0)
+        sceKernelRegisterExitCallback(cbid);
+
     sceKernelSleepThreadCB();
 
     return 0;
@@ -49,23 +51,28 @@ int main(void)
 
     pspDebugScreenInit();
 
-    pspDebugScreenPrintf("\n\n");
-    pspDebugScreenPrintf("================================\n");
-    pspDebugScreenPrintf("        IB PHENIX PSP\n");
-    pspDebugScreenPrintf("================================\n\n");
-    pspDebugScreenPrintf("      PROTOTYPE V2\n\n");
-    pspDebugScreenPrintf("      Bienvenue !\n\n");
-    pspDebugScreenPrintf("      Appuie sur START\n");
-    pspDebugScreenPrintf("      pour quitter.\n");
+    sceCtrlSetSamplingCycle(0);
+    sceCtrlSetSamplingMode(PSP_CTRL_MODE_DIGITAL);
 
     SceCtrlData pad;
 
+    pspDebugScreenPrintf("\n\n");
+    pspDebugScreenPrintf("================================\n");
+    pspDebugScreenPrintf("          IB PHENIX PSP\n");
+    pspDebugScreenPrintf("================================\n\n");
+    pspDebugScreenPrintf("          PROTOTYPE V2\n\n");
+    pspDebugScreenPrintf("          Bienvenue !\n\n");
+    pspDebugScreenPrintf("     Appuie sur START pour\n");
+    pspDebugScreenPrintf("          quitter.\n\n");
+
     while (1)
     {
-        sceCtrlReadBufferPositive(&pad, 1);
+        sceCtrlPeekBufferPositive(&pad, 1);
 
         if (pad.Buttons & PSP_CTRL_START)
+        {
             break;
+        }
 
         sceDisplayWaitVblankStart();
     }
