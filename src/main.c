@@ -52,7 +52,7 @@ int main(void)
     pspDebugScreenInit();
 
     sceCtrlSetSamplingCycle(0);
-    sceCtrlSetSamplingMode(PSP_CTRL_MODE_DIGITAL);
+    sceCtrlSetSamplingMode(PSP_CTRL_MODE_ANALOG);
 
     SceCtrlData pad;
 
@@ -62,14 +62,13 @@ int main(void)
 
         pspDebugScreenSetXY(0, 5);
 
-pspDebugScreenPrintf("BUTTONS: %08X\n", pad.Buttons);
-pspDebugScreenPrintf("ANALOG X: %3d\n", pad.Lx);
-pspDebugScreenPrintf("ANALOG Y: %3d\n", pad.Ly);
+        pspDebugScreenPrintf("IB PHENIX CONTROLLER TEST\n\n");
+        pspDebugScreenPrintf("BUTTONS : %08X\n", pad.Buttons);
+        pspDebugScreenPrintf("ANALOG X: %3d\n", pad.Lx);
+        pspDebugScreenPrintf("ANALOG Y: %3d\n", pad.Ly);
 
         if (pad.Buttons & PSP_CTRL_START)
-        {
             sceKernelExitGame();
-        }
 
         sceDisplayWaitVblankStart();
     }
