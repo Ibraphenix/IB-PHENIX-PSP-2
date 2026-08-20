@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-project(IB_PHENIX)
+project(IB_PHENIX C)
 
 set(CMAKE_C_STANDARD 99)
 
@@ -10,18 +10,13 @@ add_executable(IB_PHENIX
 
 target_link_libraries(IB_PHENIX
     pspdebug
-    pspge
     pspdisplay
     pspctrl
-    pspgu
-    pspgum
-    pspaudio
     pspkernel
-    psputility
 )
 
 add_custom_command(TARGET IB_PHENIX POST_BUILD
-    COMMAND mksfo "IB PHENIX" PARAM.SFO
+    COMMAND mksfoex -s TITLE="IB PHENIX" -s DISC_ID=IBPHNX01 "IB PHENIX" PARAM.SFO
     COMMAND pack-pbp
         EBOOT.PBP
         PARAM.SFO
