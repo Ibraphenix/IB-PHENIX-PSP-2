@@ -22,9 +22,18 @@ jobs:
             pspdev/pspdev:latest \
             sh -c 'mkdir -p build && cd build && psp-cmake .. && make -j2'
 
-      - name: Vérifier EBOOT.PBP
-        run: |
-          find . -name EBOOT.PBP -print
+      - - name: Vérifier les fichiers générés
+  run: |
+    echo "=== CONTENU DU PROJET ==="
+    find . -maxdepth 5 -type f | sort
+
+    echo ""
+    echo "=== RECHERCHE EBOOT.PBP ==="
+    find . -type f -iname "EBOOT.PBP" -print
+
+    echo ""
+    echo "=== DOSSIER BUILD ==="
+    ls -lah build 2>/dev/null || true
 
       - name: Publier EBOOT.PBP
         uses: actions/upload-artifact@v4
