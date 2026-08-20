@@ -13,6 +13,8 @@ target_link_libraries(IB_PHENIX
     pspge
     pspdisplay
     pspctrl
+    pspgu
+    pspgum
     pspkernel
 )
 
