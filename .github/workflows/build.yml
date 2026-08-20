@@ -1,4 +1,4 @@
-name: name: Build IB PHENIX PSP
+name: Build IB PHENIX PSP
 
 on:
   push:
@@ -31,4 +31,4 @@ jobs:
         with:
           name: IB-PHENIX-EBOOT
           path: "**/EBOOT.PBP"
-          if-no-files-found: errorBuild IB PHENIX 
+          if-no-files-found: error
