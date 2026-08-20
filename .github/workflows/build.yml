@@ -1,0 +1,33 @@
+name: Build IB PHENIX PSP
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Compiler avec PSPDEV
+        run: |
+          docker pull pspdev/pspdev:latest
+          docker run --rm \
+            -v "$PWD:/project" \
+            -w /project \
+            pspdev/pspdev:latest \
+            sh -c 'mkdir -p build && cd build && psp-cmake .. && make -j2'
+
+      - name: Vérifier EBOOT.PBP
+        run: |
+          find . -name EBOOT.PBP -print
+
+      - name: Publier EBOOT.PBP
+        uses: actions/upload-artifact@v4
+        with:
+          name: IB-PHENIX-EBOOT
+          path: "**/EBOOT.PBP"
