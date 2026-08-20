@@ -92,19 +92,16 @@ void drawMenu(int selected)
 void drawPlayer(int x, int y)
 {
     pspDebugScreenSetXY(x, y);
-    pspDebugScreenPrintf(" /\\ ");
+    pspDebugScreenPrintf("  O  ");
 
     pspDebugScreenSetXY(x, y + 1);
-    pspDebugScreenPrintf("/@@\\");
+    pspDebugScreenPrintf(" /|\\ ");
 
     pspDebugScreenSetXY(x, y + 2);
-    pspDebugScreenPrintf("|##|");
+    pspDebugScreenPrintf(" / \\ ");
 
     pspDebugScreenSetXY(x, y + 3);
-    pspDebugScreenPrintf("|##|");
-
-    pspDebugScreenSetXY(x, y + 4);
-    pspDebugScreenPrintf("/  \\");
+    pspDebugScreenPrintf("/___\\");
 }
 
 void drawGame(int playerX, int playerY)
@@ -117,22 +114,37 @@ void drawGame(int playerX, int playerY)
     pspDebugScreenSetXY(2, 3);
     pspDebugScreenPrintf("THE PHOENIX AWAKENS");
 
-    pspDebugScreenSetXY(2, 6);
+    pspDebugScreenSetXY(2, 5);
     pspDebugScreenPrintf(
-        "........................................................"
+        "=========================================================="
     );
 
-    pspDebugScreenSetXY(2, 22);
+    pspDebugScreenSetXY(2, 20);
     pspDebugScreenPrintf(
-        "........................................................"
+        "=========================================================="
     );
+
+    pspDebugScreenSetXY(5, 8);
+    pspDebugScreenPrintf("FOREST OF THE PHOENIX");
+
+    pspDebugScreenSetXY(5, 11);
+    pspDebugScreenPrintf("      ^       ^       ^");
+    
+    pspDebugScreenSetXY(5, 12);
+    pspDebugScreenPrintf("     /|\\     /|\\     /|\\");
+    
+    pspDebugScreenSetXY(5, 13);
+    pspDebugScreenPrintf("    /###\\   /###\\   /###\\");
+
+    pspDebugScreenSetXY(5, 17);
+    pspDebugScreenPrintf("              PATH");
 
     drawPlayer(playerX, playerY);
 
-    pspDebugScreenSetXY(2, 24);
+    pspDebugScreenSetXY(2, 22);
     pspDebugScreenPrintf("ANALOG / D-PAD : MOVE");
 
-    pspDebugScreenSetXY(2, 25);
+    pspDebugScreenSetXY(2, 24);
     pspDebugScreenPrintf("O : MENU       START : EXIT");
 }
 
@@ -178,17 +190,17 @@ void playGame(void)
         if (pad.Buttons & PSP_CTRL_DOWN)
             playerY++;
 
-        if (playerX < 2)
-            playerX = 2;
+        if (playerX < 3)
+            playerX = 3;
 
-        if (playerX > 50)
-            playerX = 50;
+        if (playerX > 48)
+            playerX = 48;
 
-        if (playerY < 7)
-            playerY = 7;
+        if (playerY < 8)
+            playerY = 8;
 
-        if (playerY > 17)
-            playerY = 17;
+        if (playerY > 15)
+            playerY = 15;
 
         if (pressed & PSP_CTRL_CIRCLE)
             running = 0;
