@@ -45,7 +45,7 @@ int SetupCallbacks(void)
     return thid;
 }
 
-void drawMenu(int selected)
+void drawMenu(int selected, int level, int xp)
 {
     pspDebugScreenClear();
 
@@ -58,21 +58,24 @@ void drawMenu(int selected)
     pspDebugScreenSetXY(10, 6);
     pspDebugScreenPrintf("PSP ADVENTURE");
 
-    pspDebugScreenSetXY(7, 9);
+    pspDebugScreenSetXY(10, 7);
+    pspDebugScreenPrintf("LEVEL %d   XP %d/100", level, xp);
+
+    pspDebugScreenSetXY(7, 10);
 
     if (selected == 0)
         pspDebugScreenPrintf("> COMMENCER L'AVENTURE");
     else
         pspDebugScreenPrintf("  COMMENCER L'AVENTURE");
 
-    pspDebugScreenSetXY(7, 11);
+    pspDebugScreenSetXY(7, 12);
 
     if (selected == 1)
         pspDebugScreenPrintf("> OPTIONS");
     else
         pspDebugScreenPrintf("  OPTIONS");
 
-    pspDebugScreenSetXY(7, 13);
+    pspDebugScreenSetXY(7, 14);
 
     if (selected == 2)
         pspDebugScreenPrintf("> QUITTER");
@@ -137,13 +140,10 @@ void drawHealth(int health)
     pspDebugScreenPrintf(" %d/10", health);
 }
 
-void drawMission(int defeated)
+void drawXP(int level, int xp)
 {
-    pspDebugScreenSetXY(35, 2);
-    pspDebugScreenPrintf("MISSION 01");
-
-    pspDebugScreenSetXY(35, 3);
-    pspDebugScreenPrintf("ENEMI: %d/1", defeated);
+    pspDebugScreenSetXY(32, 2);
+    pspDebugScreenPrintf("LV %d XP %d/100", level, xp);
 }
 
 void drawGame(
@@ -152,6 +152,8 @@ void drawGame(
     int enemyX,
     int enemyY,
     int health,
+    int level,
+    int xp,
     int defeated
 )
 {
@@ -161,7 +163,7 @@ void drawGame(
     pspDebugScreenPrintf("IB PHENIX - ZONE 01");
 
     drawHealth(health);
-    drawMission(defeated);
+    drawXP(level, xp);
 
     pspDebugScreenSetXY(2, 5);
     pspDebugScreenPrintf(
@@ -169,19 +171,13 @@ void drawGame(
     );
 
     pspDebugScreenSetXY(5, 8);
-    pspDebugScreenPrintf("MISSION 01");
+    pspDebugScreenPrintf("FOREST OF THE PHOENIX");
 
-    pspDebugScreenSetXY(5, 9);
-    pspDebugScreenPrintf("LE REVEIL DU PHENIX");
-
-    pspDebugScreenSetXY(5, 11);
-    pspDebugScreenPrintf("OBJECTIF:");
+    pspDebugScreenSetXY(5, 10);
+    pspDebugScreenPrintf("MISSION 01 : LE REVEIL DU PHENIX");
 
     pspDebugScreenSetXY(5, 12);
-    pspDebugScreenPrintf("Eliminer l'ennemi.");
-
-    pspDebugScreenSetXY(5, 16);
-    pspDebugScreenPrintf("FOREST OF THE PHOENIX");
+    pspDebugScreenPrintf("OBJECTIF : ELIMINER L'ENNEMI");
 
     if (!defeated)
         drawEnemy(enemyX, enemyY);
@@ -198,25 +194,25 @@ void drawGame(
     pspDebugScreenPrintf("START : EXIT");
 }
 
-void missionComplete(void)
+void levelUpScreen(int level)
 {
     SceCtrlData pad;
 
     pspDebugScreenClear();
 
-    pspDebugScreenSetXY(12, 6);
-    pspDebugScreenPrintf("MISSION ACCOMPLIE");
+    pspDebugScreenSetXY(13, 6);
+    pspDebugScreenPrintf("NIVEAU SUPERIEUR !");
 
-    pspDebugScreenSetXY(8, 9);
-    pspDebugScreenPrintf("LE REVEIL DU PHENIX");
+    pspDebugScreenSetXY(18, 9);
+    pspDebugScreenPrintf("LEVEL %d", level);
 
-    pspDebugScreenSetXY(8, 12);
-    pspDebugScreenPrintf("ENNEMI ELIMINE");
+    pspDebugScreenSetXY(9, 12);
+    pspDebugScreenPrintf("IB PHENIX DEVIENT PLUS FORT");
 
-    pspDebugScreenSetXY(8, 14);
-    pspDebugScreenPrintf("RECOMPENSE : +100 XP");
+    pspDebugScreenSetXY(9, 16);
+    pspDebugScreenPrintf("NOUVEAU NIVEAU DEBLOQUE");
 
-    pspDebugScreenSetXY(7, 19);
+    pspDebugScreenSetXY(8, 20);
     pspDebugScreenPrintf("APPUIE SUR X POUR CONTINUER");
 
     while (1)
@@ -233,7 +229,82 @@ void missionComplete(void)
     }
 }
 
-void playGame(void)
+void missionComplete(int *level, int *xp)
+{
+    SceCtrlData pad;
+
+    *xp += 100;
+
+    if (*xp >= 100)
+    {
+        *xp -= 100;
+        (*level)++;
+
+        pspDebugScreenClear();
+
+        pspDebugScreenSetXY(12, 5);
+        pspDebugScreenPrintf("MISSION ACCOMPLIE");
+
+        pspDebugScreenSetXY(9, 8);
+        pspDebugScreenPrintf("LE REVEIL DU PHENIX");
+
+        pspDebugScreenSetXY(10, 11);
+        pspDebugScreenPrintf("+100 XP");
+
+        pspDebugScreenSetXY(10, 13);
+        pspDebugScreenPrintf("NOUVEAU NIVEAU !");
+
+        pspDebugScreenSetXY(10, 15);
+        pspDebugScreenPrintf("LEVEL %d", *level);
+
+        pspDebugScreenSetXY(7, 19);
+        pspDebugScreenPrintf("APPUIE SUR X POUR CONTINUER");
+
+        while (1)
+        {
+            sceCtrlPeekBufferPositive(&pad, 1);
+
+            if (pad.Buttons & PSP_CTRL_CROSS)
+                break;
+
+            if (pad.Buttons & PSP_CTRL_START)
+                sceKernelExitGame();
+
+            sceDisplayWaitVblankStart();
+        }
+    }
+    else
+    {
+        pspDebugScreenClear();
+
+        pspDebugScreenSetXY(12, 6);
+        pspDebugScreenPrintf("MISSION ACCOMPLIE");
+
+        pspDebugScreenSetXY(10, 10);
+        pspDebugScreenPrintf("+100 XP");
+
+        pspDebugScreenSetXY(10, 13);
+        pspDebugScreenPrintf("XP : %d/100", *xp);
+
+        pspDebugScreenSetXY(7, 19);
+        pspDebugScreenPrintf("APPUIE SUR X POUR CONTINUER");
+
+        while (1)
+        {
+            sceCtrlPeekBufferPositive(&pad, 1);
+
+            if (pad.Buttons & PSP_CTRL_CROSS)
+                break;
+
+            if (pad.Buttons & PSP_CTRL_START)
+                sceKernelExitGame();
+
+            sceDisplayWaitVblankStart();
+        }
+    }
+}
+
+void playGame(int *level, int *xp)
 {
     SceCtrlData pad;
 
@@ -248,7 +319,6 @@ void playGame(void)
     int health = 10;
 
     int defeated = 0;
-
     int damageTimer = 0;
 
     int running = 1;
@@ -355,12 +425,17 @@ void playGame(void)
                 enemyX,
                 enemyY,
                 health,
+                *level,
+                *xp,
                 defeated
             );
 
             sceDisplayWaitVblankStart();
 
-            missionComplete();
+            missionComplete(level, xp);
+
+            if (*level > 1)
+                levelUpScreen(*level);
 
             running = 0;
         }
@@ -377,6 +452,8 @@ void playGame(void)
             enemyX,
             enemyY,
             health,
+            *level,
+            *xp,
             defeated
         );
 
@@ -402,7 +479,10 @@ int main(void)
     int selected = 0;
     int running = 1;
 
-    drawMenu(selected);
+    int level = 1;
+    int xp = 0;
+
+    drawMenu(selected, level, xp);
 
     while (running)
     {
@@ -418,7 +498,7 @@ int main(void)
             if (selected < 0)
                 selected = 2;
 
-            drawMenu(selected);
+            drawMenu(selected, level, xp);
         }
 
         if (pressed & PSP_CTRL_DOWN)
@@ -428,31 +508,34 @@ int main(void)
             if (selected > 2)
                 selected = 0;
 
-            drawMenu(selected);
+            drawMenu(selected, level, xp);
         }
 
         if (pressed & PSP_CTRL_CROSS)
         {
             if (selected == 0)
             {
-                playGame();
-                drawMenu(selected);
+                playGame(&level, &xp);
+                drawMenu(selected, level, xp);
             }
 
             if (selected == 1)
             {
                 pspDebugScreenClear();
 
-                pspDebugScreenSetXY(10, 7);
+                pspDebugScreenSetXY(10, 6);
                 pspDebugScreenPrintf("OPTIONS");
 
-                pspDebugScreenSetXY(6, 10);
+                pspDebugScreenSetXY(8, 9);
                 pspDebugScreenPrintf("IB PHENIX PSP");
 
-                pspDebugScreenSetXY(6, 12);
-                pspDebugScreenPrintf("MISSION SYSTEM");
+                pspDebugScreenSetXY(8, 11);
+                pspDebugScreenPrintf("LEVEL : %d", level);
 
-                pspDebugScreenSetXY(6, 15);
+                pspDebugScreenSetXY(8, 13);
+                pspDebugScreenPrintf("XP : %d/100", xp);
+
+                pspDebugScreenSetXY(7, 17);
                 pspDebugScreenPrintf("PRESS O TO RETURN");
 
                 while (1)
@@ -462,10 +545,13 @@ int main(void)
                     if (pad.Buttons & PSP_CTRL_CIRCLE)
                         break;
 
+                    if (pad.Buttons & PSP_CTRL_START)
+                        sceKernelExitGame();
+
                     sceDisplayWaitVblankStart();
                 }
 
-                drawMenu(selected);
+                drawMenu(selected, level, xp);
             }
 
             if (selected == 2)
